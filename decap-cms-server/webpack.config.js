@@ -24,7 +24,17 @@ module.exports = {
     rules: [
       {
         test: /\.ts$/,
-        use: ['ts-loader'],
+        use: [
+          {
+            loader: 'ts-loader',
+            options: {
+              // 添加此选项允许编译 node_modules 中的 TypeScript 文件
+              allowTsInNodeModules: true,
+              // 为了提高性能，可以针对 node_modules 禁用类型检查
+              transpileOnly: true
+            }
+          }
+        ],
       },
     ],
   },

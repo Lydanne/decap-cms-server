@@ -1,15 +1,15 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-require('dotenv').config();
-import express from 'express';
+require("dotenv").config();
+import express from "express";
 
-import { registerCommonMiddlewares } from './middlewares/common';
-import { registerMiddleware as registerLocalGit } from './middlewares/localGit';
-import { registerMiddleware as registerLocalFs } from './middlewares/localFs';
-import { createLogger } from './logger';
+import { registerCommonMiddlewares } from "./middlewares/common";
+import { registerMiddleware as registerLocalGit } from "./middlewares/localGit";
+import { registerMiddleware as registerLocalFs } from "./middlewares/localFs";
+import { createLogger } from "./logger";
 
 const app = express();
 const port = process.env.PORT || 8081;
-const level = process.env.LOG_LEVEL || 'info';
+const level = process.env.LOG_LEVEL || "info";
 
 (async () => {
   const logger = createLogger({ level });
@@ -19,17 +19,22 @@ const level = process.env.LOG_LEVEL || 'info';
 
   registerCommonMiddlewares(app, options);
 
+  // 移除 session 中间件
+
+  // 添加 body-parser 中间件处理表单数据
+  app.use(express.urlencoded({ extended: true }));
+
   try {
-    const mode = process.env.MODE || 'fs';
-    if (mode === 'fs') {
+    const mode = process.env.MODE || "fs";
+    if (mode === "fs") {
       registerLocalFs(app, options);
-    } else if (mode === 'git') {
+    } else if (mode === "git") {
       registerLocalGit(app, options);
     } else {
       throw new Error(`Unknown proxy mode '${mode}'`);
     }
   } catch (e) {
-    logger.error(e instanceof Error ? e.message : 'Unknown error');
+    logger.error(e instanceof Error ? e.message : "Unknown error");
     process.exit(1);
   }
 

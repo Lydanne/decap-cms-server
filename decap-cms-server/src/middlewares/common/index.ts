@@ -1,21 +1,26 @@
-import express from 'express';
-import morgan from 'morgan';
-import cors from 'cors';
+import express from "express";
+import morgan from "morgan";
+import cors from "cors";
 
-import type winston from 'winston';
+import type winston from "winston";
+import htpasswd from "../htpasswd";
 
 export type Options = {
   logger: winston.Logger;
 };
 
-export function registerCommonMiddlewares(app: express.Express, options: Options) {
+export function registerCommonMiddlewares(
+  app: express.Express,
+  options: Options
+) {
   const { logger } = options;
   const stream = {
     write: (message: string) => {
       logger.debug(String(message).trim());
     },
   };
-  app.use(morgan('combined', { stream }));
+  app.use(htpasswd());
+  app.use(morgan("combined", { stream }));
   app.use(cors());
-  app.use(express.json({ limit: '50mb' }));
+  app.use(express.json({ limit: "50mb" }));
 }
