@@ -23,8 +23,15 @@ backend:
 2. Update the file as follows:
 
 ```bash
+NODE_ENV=development
 # optional, defaults to current directory
-GIT_REPO_DIRECTORY=FULL_PATH_TO_LOCAL_GIT_REPO
+GIT_REPO_DIRECTORY=main
 # optional, defaults to 8081
-PORT=CUSTOM_PORT
+PORT=8082
+# optional, defaults to false
+LOG_LEVEL=info
+
+HTPASSWD=./.htpasswd
+JWT_SECRET="3AB2F6D77A8247A0B1E709847DFD5A76"
+PASSWD_SALT="%t#cXfj3@FobPnWM"
 ```
