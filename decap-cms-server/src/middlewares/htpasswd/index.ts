@@ -198,6 +198,16 @@ function verifyToken(token: string): { valid: boolean; username?: string } {
 
 export default function htpasswd(): Handler {
   return async (req, res, next) => {
+    // 设置跨域
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Headers", "*");
+    res.setHeader("Access-Control-Allow-Methods", "*");
+    // 处理预检请求
+    if (req.method === "OPTIONS") {
+      return res.sendStatus(200);
+    }
+
     // 如果请求路径是登录表单提交，跳过认证检查
     if (req.path === "/auth/login" && req.method === "POST") {
       formdata(req, res, async () => {
