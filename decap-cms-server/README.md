@@ -5,7 +5,7 @@ Decap CMS Proxy Server is an express server created to facilitate local developm
 ## How It Works
 
 1. Navigate to a local Git repository configured with the CMS.
-2. Run `npx decap-server` from the root directory of the above repository.
+2. Run `npx decap-cms-server` from the root directory of the above repository.
 3. Update your `config.yml` to connect to the server:
 
 ```yaml
@@ -16,6 +16,12 @@ backend:
 ```
 
 4. Start you local development server (e.g. run `gatsby develop`).
+
+## Gene Password
+
+```
+npx decap-cms-server --htpasswd admin:1234567
+```
 
 ## Custom Configuration
 
