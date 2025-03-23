@@ -1,10 +1,9 @@
 import type { Handler, Request, Response } from "express";
 import express from "express";
 import { jwtDecode } from "jwt-decode";
-import bcrypt from "bcrypt";
 import { readFile } from "fs/promises"; // 使用 Promise 版本的 readFile
-import crypto from "crypto";
 import jwt from "jsonwebtoken";
+import { comparePassword } from "../utils/htpasswd";
 
 // const formdata = multer().none(); // 创建一个 multer 实例，用于处理 multipart/form-data
 const formdata = express.urlencoded({ extended: true });
@@ -152,29 +151,9 @@ async function validateCredentials(
   const [_, passwordHash] = userEntry.split(":", 2);
 
   try {
-    if (passwordHash.startsWith("$2")) {
-      // bcrypt 格式
-      return await bcrypt.compare(password, passwordHash);
-    } else if (
-      passwordHash.startsWith("$apr1$") ||
-      passwordHash.startsWith("$1$")
-    ) {
-      // Apache MD5 或标准 MD5 格式 - 这里简化处理
-      console.warn(
-        "MD5 hash format detected. Consider upgrading to bcrypt for better security."
-      );
-      const md5Hash = crypto.createHash("md5").update(password).digest("hex");
-      return (
-        md5Hash === passwordHash.substring(passwordHash.lastIndexOf("$") + 1)
-      );
-    } else {
-      // 纯文本或其他未识别格式
-      console.warn(
-        "Plain text or unknown password format detected for user:",
-        username
-      );
-      return password === passwordHash;
-    }
+    // const inPasswordHash = await bcrypt.hash(password, 10);
+    // console.log(inPasswordHash, passwordHash);
+    return await comparePassword(password, passwordHash);
   } catch (error) {
     console.error("Error validating credentials:", error);
     return false;
