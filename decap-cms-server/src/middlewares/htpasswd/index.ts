@@ -234,7 +234,6 @@ export default function htpasswd(): Handler {
       if (token) {
         const { valid, username } = verifyToken(token);
         if (valid && username) {
-          console.log(`User '${username}' authenticated with token`);
           // 令牌有效，继续处理请求
           return next();
         }
