@@ -21,7 +21,7 @@ interface JwtPayload {
  * @param errorMessage
  * @returns
  */
-function generateLoginPage(originalUrl: string, errorMessage: string = "") {
+function generateLoginPage(errorMessage: string = "") {
   return `
   <!DOCTYPE html>
   <html lang="en">
@@ -91,7 +91,7 @@ function generateLoginPage(originalUrl: string, errorMessage: string = "") {
       <h1>Decap CMS Admin</h1>
       ${errorMessage ? `<p class="error-message">${errorMessage}</p>` : ""}
       <form action="/auth/login" method="POST">
-        <input type="hidden" name="originalUrl" value="${originalUrl}">
+        <input id="originalUrl" type="hidden" name="originalUrl">
         <label for="username">Username</label>
         <input type="text" id="username" name="username" required autofocus>
         <label for="password">Password</label>
@@ -99,6 +99,13 @@ function generateLoginPage(originalUrl: string, errorMessage: string = "") {
         <button type="submit">Log In</button>
       </form>
     </div>
+    <script>
+      // 获取原始 URL
+      const originalUrl = new URLSearchParams(window.location.search).get("originalUrl");
+      if (originalUrl) {
+        document.getElementById("originalUrl").value = decodeURIComponent(originalUrl);
+      }
+    </script>
   </body>
   </html>
   `;
@@ -214,6 +221,9 @@ export default function htpasswd(): Handler {
         handleLogin()(req, res, next);
       });
       return;
+    } else if (req.path === "/auth/login" && req.method === "GET") {
+      // 处理登录页面请求
+      return res.send(generateLoginPage());
     }
 
     try {
@@ -292,18 +302,17 @@ export default function htpasswd(): Handler {
       }
 
       // 没有有效认证，返回登录页面
-      return res.send(generateLoginPage(req.originalUrl || req.url));
+      return res.redirect(
+        "/auth/login?originalUrl=" + encodeURIComponent(req.originalUrl)
+      );
     } catch (error) {
       console.error("Authentication error:", error);
       // 如果是 API 请求，返回 JSON 错误
       if (req.xhr || req.headers.accept?.includes("application/json")) {
         return res.status(500).json({ error: "Authentication system error" });
       }
-      return res.send(
-        generateLoginPage(
-          req.originalUrl || req.url,
-          "Authentication system error"
-        )
+      return res.redirect(
+        "/auth/login?originalUrl=" + encodeURIComponent(req.originalUrl)
       );
     }
   };
@@ -318,12 +327,7 @@ export function handleLogin(): Handler {
       if (!username || !password) {
         return res
           .status(400)
-          .send(
-            generateLoginPage(
-              originalUrl || "",
-              "Username and password are required"
-            )
-          );
+          .send(generateLoginPage("Username and password are required"));
       }
 
       const htpasswdPath = process.env.HTPASSWD;
@@ -331,9 +335,7 @@ export function handleLogin(): Handler {
         console.error("HTPASSWD environment variable is not set");
         return res
           .status(500)
-          .send(
-            generateLoginPage(originalUrl || "", "Server configuration error")
-          );
+          .send(generateLoginPage("Server configuration error"));
       }
 
       const htpasswd = await readHtpasswdFile(htpasswdPath);
@@ -360,23 +362,13 @@ export function handleLogin(): Handler {
         // 认证失败，返回登录页面并显示错误
         return res
           .status(401)
-          .send(
-            generateLoginPage(
-              originalUrl || "/",
-              "Invalid username or password"
-            )
-          );
+          .send(generateLoginPage("Invalid username or password"));
       }
     } catch (error) {
       console.error("Login error:", error);
       return res
         .status(500)
-        .send(
-          generateLoginPage(
-            req.body.originalUrl || "/",
-            "Authentication system error"
-          )
-        );
+        .send(generateLoginPage("Authentication system error"));
     }
   };
 }

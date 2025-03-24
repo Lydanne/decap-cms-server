@@ -1,0 +1,636 @@
+backend:
+  name: git-gateway
+
+local_backend:
+  # when using a custom proxy server port
+  url: http://localhost:8082/api/v1
+  # url: https://bground.eaiconcn.com/api/v1
+  # when accessing the local site from a host other than 'localhost' or '127.0.0.1'
+  allowed_hosts: ["0.0.0.0"]
+
+site_url: http://localhost:1313/
+# site_url: https://side.eaiconcn.com/
+
+publish_mode: editorial_workflow
+media_folder: public/www.assets
+public_folder: "/www.assets"
+
+collections: # A list of collections the CMS should be able to edit
+  - name: "home" # Used in routes, ie.: /admin/collections/:slug/edit
+    label: "首页配置" # Used in the UI
+    label_singular: "首页" # Used in the UI, ie: "New Post"
+    folder: "content/"
+    summary: "首页配置"
+    create: false # Allow users to create new documents in this collection
+    show_preview_links: false
+    editor:
+      preview: false
+      visualEditing: true
+    fields: # The fields each document in this collection have
+      - { label: "标题", name: "fancyTitle", widget: "string", tagname: "h1" }
+      - { label: "草稿", name: "draft", widget: "boolean", default: false }
+      - { label: "描述", name: "description", widget: "text" }
+      - { label: "开始按钮文本", name: "startbuttonText", widget: "string" }
+      - { label: "开始按钮链接", name: "startbuttonLink", widget: "string" }
+      - {
+          label: "封面图",
+          name: "image",
+          widget: "image",
+          required: false,
+          tagname: "",
+        }
+      - label: "第一部分"
+        name: "one"
+        widget: "object"
+        fields:
+          - { label: "启用", name: "enable", widget: "boolean", default: true }
+          - { label: "标题", name: "title", widget: "text" }
+          - { label: "内容", name: "body", widget: "markdown" }
+          - label: "图标"
+            name: "icon"
+            widget: "list"
+            fields:
+              - { label: "图标名称", name: "icon", widget: "string" }
+              - { label: "样式", name: "style", widget: "string" }
+              - { label: "标签", name: "label", widget: "string" }
+      - label: "第二部分"
+        name: "two"
+        widget: "object"
+        fields:
+          - { label: "启用", name: "enable", widget: "boolean", default: true }
+          - label: "区块"
+            name: "section"
+            widget: "list"
+            fields:
+              - { label: "图片", name: "img", widget: "image" }
+              - {
+                  label: "图片替代文本",
+                  name: "img_alt",
+                  widget: "string",
+                  required: false,
+                }
+              - { label: "标题", name: "title", widget: "string" }
+              - { label: "内容", name: "body", widget: "text" }
+      - label: "第三部分"
+        name: "three"
+        widget: "object"
+        fields:
+          - { label: "启用", name: "enable", widget: "boolean", default: true }
+          - { label: "标题", name: "title", widget: "string" }
+          - { label: "内容", name: "body", widget: "markdown" }
+          - label: "特性"
+            name: "feature"
+            widget: "list"
+            fields:
+              - { label: "图标", name: "icon", widget: "string" }
+              - { label: "标题", name: "title", widget: "string" }
+              - { label: "内容", name: "body", widget: "text" }
+      - label: "号召行动"
+        name: "cta"
+        widget: "object"
+        fields:
+          - { label: "启用", name: "enable", widget: "boolean", default: true }
+          - { label: "标题", name: "title", widget: "string" }
+          - { label: "内容", name: "body", widget: "text" }
+          - label: "链接"
+            name: "link"
+            widget: "list"
+            fields:
+              - { label: "链接地址", name: "href", widget: "string" }
+              - { label: "链接文本", name: "text", widget: "string" }
+              - {
+                  label: "特殊样式",
+                  name: "special",
+                  widget: "boolean",
+                  default: false,
+                }
+      # - label: '联系我们'
+      #   name: 'contact'
+      #   widget: 'object'
+      #   fields:
+      #     - { label: '启用', name: 'enable', widget: 'boolean', default: false }
+      #     - { label: '标题', name: 'title', widget: 'string' }
+      #     - { label: '内容', name: 'body', widget: 'text' }
+      #     - { label: '电话', name: 'phone', widget: 'string' }
+      #     - { label: '地址', name: 'address', widget: 'text' }
+      #     - { label: '邮箱', name: 'email', widget: 'string' }
+      #     - { label: '主题', name: 'subject', widget: 'string' }
+      #     - { label: 'Formspree表单ID', name: 'formspree_form_id', widget: 'string' }
+      - label: "支持单位"
+        name: "support"
+        widget: "object"
+        fields:
+          - { label: "启用", name: "enable", widget: "boolean", default: true }
+          - {
+              label: "图片列表",
+              name: "images",
+              widget: "list",
+              field: { label: "图片", name: "image", widget: "image" },
+            }
+      # - label: '社交媒体'
+      #   name: 'social'
+      #   widget: 'object'
+      #   fields:
+      #     - { label: 'Twitter', name: 'twitter', widget: 'string', required: false }
+      #     - { label: 'Mastodon', name: 'mastodon', widget: 'string', required: false }
+      #     - { label: 'Github', name: 'github', widget: 'string', required: false }
+      #     - { label: 'Facebook', name: 'facebook', widget: 'string', required: false }
+      #     - { label: 'YouTube', name: 'youtube', widget: 'string', required: false }
+      #     - { label: 'Instagram', name: 'instagram', widget: 'string', required: false }
+      #     - { label: 'Dribble', name: 'dribble', widget: 'string', required: false }
+      # - { label: '内容', name: 'body', widget: 'markdown', hint: '输入正文内容', required: false }
+
+  - name: "game" # Used in routes, ie.: /admin/collections/:slug/edit
+    label: "比赛专栏" # Used in the UI
+    label_singular: "赛事" # Used in the UI, ie: "New Post"
+    folder: "content/game"
+    slug: "{{slug}}"
+    summary: "{{title}} -- {{year}}/{{month}}/{{day}}"
+    create: true # Allow users to create new documents in this collection
+    show_preview_links: false
+    editor:
+      preview: false
+      visualEditing: true
+    view_filters:
+      - label: 是否草稿
+        field: draft
+        pattern: true
+    view_groups:
+      - label: 草稿
+        field: draft
+    fields: # The fields each document in this collection have
+      - { label: "标题", name: "title", widget: "string", tagname: "h1" }
+      - { label: "草稿", name: "draft", widget: "boolean", default: false }
+      - {
+          label: "TOC",
+          name: "toc",
+          widget: "boolean",
+          default: true,
+          required: false,
+        }
+      - {
+          label: "权重",
+          name: "weight",
+          widget: "number",
+          default: 1,
+          required: false,
+        }
+      - {
+          label: "发布日期",
+          name: "date",
+          widget: "datetime",
+          format: "YYYY-MM-DD HH:mm",
+          default: "{{now}}",
+        }
+      - label: "封面图"
+        name: "image"
+        widget: "image"
+        required: false
+        tagname: ""
+      - {
+          label: "内容",
+          name: "body",
+          widget: "markdown",
+          hint: "输入正文内容",
+          required: false,
+        }
+
+  - name: "conference" # Used in routes, ie.: /admin/collections/:slug/edit
+    label: "大会专栏" # Used in the UI
+    folder: "content/conference"
+    slug: "{{slug}}"
+    summary: "{{title}} -- {{year}}/{{month}}/{{day}}"
+    create: false
+    delete: false
+    show_preview_links: false
+    editor:
+      preview: false
+      visualEditing: true
+    view_filters:
+      - label: 是否草稿
+        field: draft
+        pattern: true
+    view_groups:
+      - label: 草稿
+        field: draft
+    fields: # The fields each document in this collection have
+      - { label: "标题", name: "title", widget: "string", tagname: "h1" }
+      - { label: "草稿", name: "draft", widget: "boolean", default: false }
+      - {
+          label: "TOC",
+          name: "toc",
+          widget: "boolean",
+          default: true,
+          required: false,
+        }
+      - {
+          label: "权重",
+          name: "weight",
+          widget: "number",
+          default: 1,
+          required: false,
+        }
+      - {
+          label: "发布日期",
+          name: "date",
+          widget: "datetime",
+          format: "YYYY-MM-DD HH:mm",
+          default: "{{now}}",
+        }
+      - label: "封面图"
+        name: "image"
+        widget: "image"
+        required: false
+        tagname: ""
+      - {
+          label: "内容",
+          name: "body",
+          widget: "markdown",
+          hint: "输入正文内容",
+          required: false,
+        }
+
+  - name: "performance" # Used in routes, ie.: /admin/collections/:slug/edit
+    label: "表演专栏" # Used in the UI
+    folder: "content/performance"
+    slug: "{{slug}}"
+    summary: "{{title}} -- {{year}}/{{month}}/{{day}}"
+    create: false
+    delete: false
+    show_preview_links: false
+    editor:
+      preview: false
+      visualEditing: true
+    view_filters:
+      - label: 是否草稿
+        field: draft
+        pattern: true
+    view_groups:
+      - label: 草稿
+        field: draft
+    fields: # The fields each document in this collection have
+      - { label: "标题", name: "title", widget: "string", tagname: "h1" }
+      - { label: "草稿", name: "draft", widget: "boolean", default: false }
+      - {
+          label: "TOC",
+          name: "toc",
+          widget: "boolean",
+          default: true,
+          required: false,
+        }
+      - {
+          label: "权重",
+          name: "weight",
+          widget: "number",
+          default: 1,
+          required: false,
+        }
+      - {
+          label: "发布日期",
+          name: "date",
+          widget: "datetime",
+          format: "YYYY-MM-DD HH:mm",
+          default: "{{now}}",
+        }
+      - label: "封面图"
+        name: "image"
+        widget: "image"
+        required: false
+        tagname: ""
+      - {
+          label: "内容",
+          name: "body",
+          widget: "markdown",
+          hint: "输入正文内容",
+          required: false,
+        }
+
+  - name: "announcements" # Used in routes, ie.: /admin/collections/:slug/edit
+    label: "公告/资料" # Used in the UI
+    folder: "content/announcements"
+    slug: "{{slug}}"
+    summary: "{{title}} -- {{year}}/{{month}}/{{day}}"
+    create: false
+    delete: false
+    show_preview_links: false
+    editor:
+      preview: false
+      visualEditing: true
+    view_filters:
+      - label: 是否草稿
+        field: draft
+        pattern: true
+    view_groups:
+      - label: 草稿
+        field: draft
+    fields: # The fields each document in this collection have
+      - { label: "标题", name: "title", widget: "string", tagname: "h1" }
+      - { label: "草稿", name: "draft", widget: "boolean", default: false }
+      - {
+          label: "TOC",
+          name: "toc",
+          widget: "boolean",
+          default: true,
+          required: false,
+        }
+      - {
+          label: "权重",
+          name: "weight",
+          widget: "number",
+          default: 1,
+          required: false,
+        }
+      - {
+          label: "发布日期",
+          name: "date",
+          widget: "datetime",
+          format: "YYYY-MM-DD HH:mm",
+          default: "{{now}}",
+        }
+      - label: "封面图"
+        name: "image"
+        widget: "image"
+        required: false
+        tagname: ""
+      - {
+          label: "内容",
+          name: "body",
+          widget: "markdown",
+          hint: "输入正文内容",
+          required: false,
+        }
+
+  - name: "registration" # Used in routes, ie.: /admin/collections/:slug/edit
+    label: "报名申请" # Used in the UI
+    folder: "content/registration"
+    slug: "{{slug}}"
+    summary: "{{title}} -- {{year}}/{{month}}/{{day}}"
+    create: false
+    delete: false
+    show_preview_links: false
+    editor:
+      preview: false
+      visualEditing: true
+    view_filters:
+      - label: 是否草稿
+        field: draft
+        pattern: true
+    view_groups:
+      - label: 草稿
+        field: draft
+    fields: # The fields each document in this collection have
+      - { label: "标题", name: "title", widget: "string", tagname: "h1" }
+      - { label: "草稿", name: "draft", widget: "boolean", default: false }
+      - {
+          label: "TOC",
+          name: "toc",
+          widget: "boolean",
+          default: true,
+          required: false,
+        }
+      - {
+          label: "权重",
+          name: "weight",
+          widget: "number",
+          default: 1,
+          required: false,
+        }
+      - {
+          label: "发布日期",
+          name: "date",
+          widget: "datetime",
+          format: "YYYY-MM-DD HH:mm",
+          default: "{{now}}",
+        }
+      - label: "封面图"
+        name: "image"
+        widget: "image"
+        required: false
+        tagname: ""
+      - {
+          label: "内容",
+          name: "body",
+          widget: "markdown",
+          hint: "输入正文内容",
+          required: false,
+        }
+
+  - name: "organization" # Used in routes, ie.: /admin/collections/:slug/edit
+    label: "组织单位" # Used in the UI
+    folder: "content/organization"
+    slug: "{{slug}}"
+    summary: "{{title}} -- {{year}}/{{month}}/{{day}}"
+    create: false
+    delete: false
+    show_preview_links: false
+    editor:
+      preview: false
+      visualEditing: true
+    view_filters:
+      - label: 是否草稿
+        field: draft
+        pattern: true
+    view_groups:
+      - label: 草稿
+        field: draft
+    fields: # The fields each document in this collection have
+      - { label: "标题", name: "title", widget: "string", tagname: "h1" }
+      - { label: "草稿", name: "draft", widget: "boolean", default: false }
+      - {
+          label: "TOC",
+          name: "toc",
+          widget: "boolean",
+          default: true,
+          required: false,
+        }
+      - {
+          label: "权重",
+          name: "weight",
+          widget: "number",
+          default: 1,
+          required: false,
+        }
+      - {
+          label: "发布日期",
+          name: "date",
+          widget: "datetime",
+          format: "YYYY-MM-DD HH:mm",
+          default: "{{now}}",
+        }
+      - label: "封面图"
+        name: "image"
+        widget: "image"
+        required: false
+        tagname: ""
+      - {
+          label: "内容",
+          name: "body",
+          widget: "markdown",
+          hint: "输入正文内容",
+          required: false,
+        }
+
+  - name: "speakers" # Used in routes, ie.: /admin/collections/:slug/edit
+    label: "演讲嘉宾及主题" # Used in the UI
+    folder: "content/speakers"
+    slug: "{{slug}}"
+    summary: "{{title}} -- {{year}}/{{month}}/{{day}}"
+    create: false
+    delete: false
+    show_preview_links: false
+    editor:
+      preview: false
+      visualEditing: true
+    view_filters:
+      - label: 是否草稿
+        field: draft
+        pattern: true
+    view_groups:
+      - label: 草稿
+        field: draft
+    fields: # The fields each document in this collection have
+      - { label: "标题", name: "title", widget: "string", tagname: "h1" }
+      - { label: "草稿", name: "draft", widget: "boolean", default: false }
+      - {
+          label: "TOC",
+          name: "toc",
+          widget: "boolean",
+          default: true,
+          required: false,
+        }
+      - {
+          label: "权重",
+          name: "weight",
+          widget: "number",
+          default: 1,
+          required: false,
+        }
+      - {
+          label: "发布日期",
+          name: "date",
+          widget: "datetime",
+          format: "YYYY-MM-DD HH:mm",
+          default: "{{now}}",
+        }
+      - label: "封面图"
+        name: "image"
+        widget: "image"
+        required: false
+        tagname: ""
+      - {
+          label: "内容",
+          name: "body",
+          widget: "markdown",
+          hint: "输入正文内容",
+          required: false,
+        }
+
+  - name: "expert" # Used in routes, ie.: /admin/collections/:slug/edit
+    label: "专家团" # Used in the UI
+    folder: "content/expert"
+    slug: "{{slug}}"
+    summary: "{{title}} -- {{year}}/{{month}}/{{day}}"
+    create: false
+    delete: false
+    show_preview_links: false
+    editor:
+      preview: false
+      visualEditing: true
+    view_filters:
+      - label: 是否草稿
+        field: draft
+        pattern: true
+    view_groups:
+      - label: 草稿
+        field: draft
+    fields: # The fields each document in this collection have
+      - { label: "标题", name: "title", widget: "string", tagname: "h1" }
+      - { label: "草稿", name: "draft", widget: "boolean", default: false }
+      - {
+          label: "TOC",
+          name: "toc",
+          widget: "boolean",
+          default: true,
+          required: false,
+        }
+      - {
+          label: "权重",
+          name: "weight",
+          widget: "number",
+          default: 1,
+          required: false,
+        }
+      - {
+          label: "发布日期",
+          name: "date",
+          widget: "datetime",
+          format: "YYYY-MM-DD HH:mm",
+          default: "{{now}}",
+        }
+      - label: "封面图"
+        name: "image"
+        widget: "image"
+        required: false
+        tagname: ""
+      - {
+          label: "内容",
+          name: "body",
+          widget: "markdown",
+          hint: "输入正文内容",
+          required: false,
+        }
+
+  - name: "collaboration" # Used in routes, ie.: /admin/collections/:slug/edit
+    label: "合作对接" # Used in the UI
+    folder: "content/collaboration"
+    slug: "{{slug}}"
+    summary: "{{title}} -- {{year}}/{{month}}/{{day}}"
+    create: false
+    delete: false
+    show_preview_links: false
+    editor:
+      preview: false
+      visualEditing: true
+    view_filters:
+      - label: 是否草稿
+        field: draft
+        pattern: true
+    view_groups:
+      - label: 草稿
+        field: draft
+    fields: # The fields each document in this collection have
+      - { label: "标题", name: "title", widget: "string", tagname: "h1" }
+      - { label: "草稿", name: "draft", widget: "boolean", default: false }
+      - {
+          label: "TOC",
+          name: "toc",
+          widget: "boolean",
+          default: true,
+          required: false,
+        }
+      - {
+          label: "权重",
+          name: "weight",
+          widget: "number",
+          default: 1,
+          required: false,
+        }
+      - {
+          label: "发布日期",
+          name: "date",
+          widget: "datetime",
+          format: "YYYY-MM-DD HH:mm",
+          default: "{{now}}",
+        }
+      - label: "封面图"
+        name: "image"
+        widget: "image"
+        required: false
+        tagname: ""
+      - {
+          label: "内容",
+          name: "body",
+          widget: "markdown",
+          hint: "输入正文内容",
+          required: false,
+        }
