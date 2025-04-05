@@ -3,7 +3,7 @@ backend:
 
 local_backend:
   # when using a custom proxy server port
-  url: http://localhost:8082/api/v1
+  url: http://localhost:8081/api/v1
   # url: https://bground.eaiconcn.com/api/v1
   # when accessing the local site from a host other than 'localhost' or '127.0.0.1'
   allowed_hosts: ["0.0.0.0"]
